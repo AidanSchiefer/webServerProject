@@ -24,6 +24,7 @@
 // **************************************************************************************
 #include "webServer.h"
 #include <cerrno>
+#include <signal.h>
 
 
 // **************************************************************************************
@@ -31,7 +32,12 @@
 // * - Display the signal and exit (returning 0 to OS indicating normal shutdown)
 // * - Optional for 471, required for 598
 // **************************************************************************************
-// void sig_handler(int signo) {}
+void sig_handler(int signo) {
+  DEBUG << "Caught a signal: " << signo << ENDL;
+  DEBUG << "Closing the socket" << ENDL;
+  closefrom(3);
+  exit(1);
+}
 
 
 // **************************************************************************************
@@ -121,9 +127,9 @@ int main (int argc, char *argv[]) {
   }
 
 
-  // *******************************************************************
-  // * Catch all possible signals
-  // ********************************************************************
+
+  // Calling the signal call
+  signal(SIGINT, sig_handler);
   DEBUG << "Setting up signal handlers" << ENDL;
   
 
