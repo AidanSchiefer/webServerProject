@@ -211,7 +211,13 @@ int main (int argc, char *argv[]) {
     int connFd = 0;
     DEBUG << "Calling connFd = accept(fd,NULL,NULL)." << ENDL;
 
-    
+    // Calling the accept function
+    connFd = accept(listenFd, NULL, NULL);
+
+    // Check if the accept call returned -1. If so, continue to the next iteration
+    if (connFd == -1){
+      continue;
+    }
 
     DEBUG << "We have recieved a connection on " << connFd << ". Calling processConnection(" << connFd << ")" << ENDL;
     quitProgram = processConnection(connFd);
