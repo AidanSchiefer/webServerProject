@@ -107,7 +107,6 @@ int processConnection(int sockFd) {
 
 int main (int argc, char *argv[]) {
 
-
   // ********************************************************************
   // * Process the command line arguments
   // ********************************************************************
@@ -126,17 +125,9 @@ int main (int argc, char *argv[]) {
     }
   }
 
-
-
   // Calling the signal call
   signal(SIGINT, sig_handler);
   DEBUG << "Setting up signal handlers" << ENDL;
-  
-
-  
-  // *******************************************************************
-  // * Creating the inital socket using the socket() call.
-  // ********************************************************************
 
   // Create the socket
   int listenFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -206,12 +197,7 @@ int main (int argc, char *argv[]) {
   listen(listenFd, 5);
   DEBUG << "Calling listen()" << ENDL;
 
-
-  // ********************************************************************
-  // * The accept call will sleep, waiting for a connection.  When 
-  // * a connection request comes in the accept() call creates a NEW
-  // * socket with a new fd that will be used for the communication.
-  // ********************************************************************
+  // ----- Accept validation loop -----
   int quitProgram = 0;
   while (!quitProgram) {
     int connFd = 0;
