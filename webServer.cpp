@@ -196,11 +196,8 @@ int main (int argc, char *argv[]) {
   std::cout << "Using port: " << port << std::endl;
 
 
-  // ********************************************************************
-  // * Setting the socket to the listening state is the second step
-  // * needed to being accepting connections.  This creates a que for
-  // * connections and starts the kernel listening for connections.
-  // ********************************************************************
+  // Calling the listen() function with a backlog of 5
+  listen(listenFd, 5);
   DEBUG << "Calling listen()" << ENDL;
 
 
