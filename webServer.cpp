@@ -23,6 +23,7 @@
 // * - Program is terminated with SIGINT (ctrl-C)
 // **************************************************************************************
 #include "webServer.h"
+#include <cerrno>
 
 
 // **************************************************************************************
@@ -130,34 +131,68 @@ int main (int argc, char *argv[]) {
   // *******************************************************************
   // * Creating the inital socket using the socket() call.
   // ********************************************************************
-  int listenFd;
+
+  // Create the socket
+  int listenFd = socket(AF_INET, SOCK_STREAM, 0);
   DEBUG << "Calling Socket() assigned file descriptor " << listenFd << ENDL;
 
-  
-  // ********************************************************************
-  // * The bind() call takes a structure used to spefiy the details of the connection. 
-  // *
-  // * struct sockaddr_in servaddr;
-  // *
-  // On a cient it contains the address of the server to connect to. 
-  // On the server it specifies which IP address and port to lisen for connections.
-  // If you want to listen for connections on any IP address you use the
-  // address INADDR_ANY
-  // ********************************************************************
+  // Check to see if the socket() call failed
+  if (listenFd == -1){
+    std::cout << "Socket() call failed" << std::endl;
+    return -1;
+  }
 
-
-
-  // ********************************************************************
-  // * Binding configures the socket with the parameters we have
-  // * specified in the servaddr structure.  This step is implicit in
-  // * the connect() call, but must be explicitly listed for servers.
-  // *
-  // * Don't forget to check to see if bind() fails because the port
-  // * you picked is in use, and if the port is in use, pick a different one.
-  // ********************************************************************
+  // Port value
   uint16_t port;
   DEBUG << "Calling bind()" << ENDL;
   
+  //----- Bind verification loop -----
+
+  // Boolean exitLoop condition
+  bool exitLoop = false;
+
+  // Int port placeholder
+  int tempPort = 1029;
+
+  // fill out regular sockaddr_in structure
+  sockaddr_in serverAddress;
+  memset(&serverAddress, 0, sizeof(serverAddress));
+  serverAddress.sin_family = AF_INET;
+  serverAddress.sin_addr.s_addr = INADDR_ANY;
+
+  // Bind loop
+  while (!exitLoop){
+
+    // Assign tempPort to port
+    port = tempPort;
+
+    // Fill out sockaddr_in port
+    serverAddress.sin_port = htons(port);
+
+    // Bind the socket, and verify the return value
+    if (bind(listenFd, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) == -1){
+      // The bind call has failed. Using the value stored in errno, determine if the port is already being used, or if another error took place
+      if (errno == EADDRINUSE){
+        // Output error message
+        std::cout << "Port number is already being used. Trying a new port" << std::endl;
+        
+        // Increase tempPort variable by one, then try again
+        tempPort = tempPort + 1;
+      } else {
+        // Output error message
+        std::cout << "There is something else wrong with the program" << std::endl;
+
+        // Return from main (quit the program)
+        close(listenFd);
+        return -1;
+      }
+    }
+    else {
+      // Set exitLoop to true to exit the validation loop
+      exitLoop = true;
+    }
+  }
+
   std::cout << "Using port: " << port << std::endl;
 
 
