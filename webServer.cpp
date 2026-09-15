@@ -82,24 +82,32 @@ void sesendFile(int sockFd,std::string filename) {
 }
 
 
-// **************************************************************************************
-// * processConnection
-// * -- process one connection/request.
-// **************************************************************************************
+// Process connection function
 int processConnection(int sockFd) {
  
+  // Create a fileName string to pass into readHeader()
+  std::string fileName;
+
+  // Int variable to store header return value
+  int returnHeader = 0;
+
   // Call readHeader()
+  returnHeader = readHeader(sockFd, fileName);
 
   // If read header returned 400, send 400
+  if (returnHeader == 400){
+    send400(sockFd);
+  }
 
   // If read header returned 404, call send404
+  if (returnHeader == 404){
+    send404(sockFd);
+  }
 
   // 471: If read header returned 200, call sendFile
-  
-  // 598 students
-  // - If the header was valid and the method was GET, call sendFile()
-  // - If the header was valid and the method was HEAD, call a function to send back the header.
-  // - If the header was valid and the method was POST, call a function to save the file to dis.
+  if (returnHeader == 200){
+    sendFile(sockFd, fileName);
+  }
 
   return 0;
 }
