@@ -82,10 +82,11 @@ int readHeader(int sockFd,std::string &filename) {
   // Parse through the header to find a valid get
   if (bufferToString.find("\r\n") != std::string::npos){
     // Copy the first line
-    std::string headerFirstLine = bufferToString.find("\r\n");
+    int index = bufferToString.find("\r\n");
+    std::string headerFirstLine = bufferToString.substr(0, index);
 
     // Check if the first line contains GET
-    if (headerFirstLine.find("GET") != std:string::npos){
+    if (headerFirstLine.substr(0, 3) == "GET"){
       // If there is a filename, determine if the file matches the correct format
     }
   }
