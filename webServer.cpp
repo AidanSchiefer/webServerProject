@@ -84,10 +84,22 @@ int readHeader(int sockFd,std::string &filename) {
     // Copy the first line
     int index = bufferToString.find("\r\n");
     std::string headerFirstLine = bufferToString.substr(0, index);
+    std::smatch match;
 
     // Check if the first line contains GET
     if (headerFirstLine.substr(0, 3) == "GET"){
       // If there is a filename, determine if the file matches the correct format
+      std::regex filePattern1(R"(/file\d\.html)");
+      std::regex filePattern2(R"(/image\d\.jpg)");
+
+      if (std::regex_search(headerFirstLine, match, filePattern1) || std::regex_search(headerFirstLine, match, filePattern2)){
+        filename = match[0];
+        returnCode = 200;
+      }
+      else{
+        filename = "";
+        returnCode = 404;
+      }
     }
   }
 
