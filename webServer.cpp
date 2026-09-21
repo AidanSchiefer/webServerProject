@@ -25,6 +25,7 @@
 #include "webServer.h"
 #include <cerrno>
 #include <signal.h>
+#include <array>
 
 
 // **************************************************************************************
@@ -46,7 +47,51 @@ void sig_handler(int signo) {
 //   - Set filename if appropriate. Filename syntax is valided but existance is not verified.
 // **************************************************************************************
 int readHeader(int sockFd,std::string &filename) {
-  return 0;
+  // Set the default return code to 400
+  int returnCode = 400;
+
+  // Read everything up to and including the end of the header
+  // Create a char buffer and string container
+  char buffer[10] = {0};
+  std::string bufferToString = "";
+
+  // Call read continuously
+  while (true){
+    // Zero out the buffer to remove any leftover junk
+    memset(buffer, 0, sizeof(buffer));
+
+    // Store the read result in an int
+    int readResult = read(sockFd, buffer, sizeof(buffer));
+
+    // If the buffer is 0, exit the loop
+    if (readResult == 0){
+      break;
+    }
+    else if (readResult == -1) {
+      ERROR << "Pipe Broken" << ENDL;
+      return returnCode;
+    }
+    // Add the buffer to the buffer string
+    bufferToString += buffer;
+    // Check if buffer has the termination pattern, else continue the loop
+    if (bufferToString.find("\r\n\r\n") != std::string::npos){
+      break;
+    }
+  }
+
+  // Parse through the header to find a valid get
+  if (bufferToString.find("\r\n") != std::string::npos){
+    // Copy the first line
+    std::string headerFirstLine = bufferToString.find("\r\n");
+
+    // Check if the first line contains GET
+    if (headerFirstLine.find("GET") != std:string::npos){
+      // If there is a filename, determine if the file matches the correct format
+    }
+  }
+
+
+  return returnCode;
 }
 
 
