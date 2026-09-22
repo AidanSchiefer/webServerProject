@@ -132,7 +132,14 @@ void send404(int sockFd) {
 // * Send the entire 400 response, header and body.
 // **************************************************************************
 void send400(int sockFd) {
-  return;
+  // Create a 400 error string
+  std::string msg400 = "HTTP/1.0 400 Bad Request";
+  std::string empty = "";
+  // Send the properly formatted 400 response
+  sendLine(sockFd, msg400);
+
+  // Send a blank line
+  sendLine(sockFd, empty);
 }
 
 
