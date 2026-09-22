@@ -159,7 +159,89 @@ void send400(int sockFd) {
 // * -- Send a file back to the browser.
 // **************************************************************************************
 void sendFile(int sockFd,std::string filename) {
+  // Create send line string formats
+  std::string msg200 = "HTTP/1.0 200 OK";
+  std::string contentTypeText = "content-type: text/html";
+  std::string contentTypeImage = "content-type: image/jpg";
+  std::string contentLength = "content-length: ";
+  std::string empty = "";
+  char buffer[10] = {0};
+  struct stat fileInfo;
 
+  // Call the stat function to get the file size
+  int statResult = stat(filename.c_str(), &fileInfo);
+  // If the stat call fails, send a 404 and exit the function
+  if (statResult == -1){
+    send404(sockFd);
+    return;
+  }
+
+  // Send the HTTP 200 message
+  sendLine(sockFd, msg200);
+
+  // Send the blank line
+  sendLine(sockFd, empty);
+
+  // Create regex patterns to identify file content type
+  std::regex textPattern(R"(data/file\d\.html)");
+  std::regex imagePattern(R"(data/image\d\.jpg)");
+
+  // Send header line based off content type
+  if (std::regex_match(filename, textPattern)){
+    sendLine(sockFd, contentTypeText);
+  }
+  else if (std::regex_match(filename, imagePattern)){
+    sendLine(sockFd, contentTypeImage);
+  }
+  else {
+    send404(sockFd);
+    return;
+  }
+
+  // Send the content length
+  contentLength += std::to_string(fileInfo.st_size);
+  sendLine(sockFd, contentLength);
+
+  // Send a blank line
+  sendLine(sockFd, empty);
+
+  // Open the file
+  int bytesWritten = 0;
+  int openResult = open(filename.c_str(), O_RDONLY);
+
+  if (openResult == -1){
+    send404(sockFd);
+    return;
+  }
+
+  // Write loop
+  while (bytesWritten != fileInfo.st_size){
+    // Clear out the buffer
+    memset(buffer, 0, sizeof(buffer));
+
+    // Read up to 10 bytes from the file into the memory buffer
+    int readAmount = read(openResult, buffer, sizeof(buffer));
+
+    // I the buffer is 0, exit the loop
+    if (readAmount == 0){
+      break;
+    }
+    else if (readAmount == -1){
+      close(openResult);
+      return;
+    }
+
+    // Write the number of bytes that have been read
+    write(sockFd, buffer, readAmount);
+
+    // Increase bytes written
+    bytesWritten += readAmount;
+  }
+
+  // Close the opened file
+  close(openResult);
+
+  return;
 }
 
 
