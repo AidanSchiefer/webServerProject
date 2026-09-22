@@ -125,7 +125,18 @@ void sendLine(int socketFd, std::string &stringToSend) {
 // * Send the entire 404 response, header and body.
 // **************************************************************************
 void send404(int sockFd) {
-  return;
+  // String definitions for lines to be sent
+  std::string msg404 = "HTTP/1.0 404 Not Found";
+  std::string contentType = "content-type: text/html";
+  std::string empty = "";
+  std::string errorMsg = "The requested file was not valid";
+
+  // sendLine function calls
+  sendLine(sockFd, msg404);
+  sendLine(sockFd, contentType);
+  sendLine(sockFd, empty);
+  sendLine(sockFd, errorMsg);
+  sendLine(sockFd, empty);
 }
 
 // **************************************************************************
@@ -148,7 +159,7 @@ void send400(int sockFd) {
 // * -- Send a file back to the browser.
 // **************************************************************************************
 void sendFile(int sockFd,std::string filename) {
-  return;
+
 }
 
 
