@@ -147,7 +147,7 @@ void send400(int sockFd) {
 // * sendFile
 // * -- Send a file back to the browser.
 // **************************************************************************************
-void sesendFile(int sockFd,std::string filename) {
+void sendFile(int sockFd,std::string filename) {
   return;
 }
 
