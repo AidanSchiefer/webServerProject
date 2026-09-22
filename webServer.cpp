@@ -89,12 +89,12 @@ int readHeader(int sockFd,std::string &filename) {
     // Check if the first line contains GET
     if (headerFirstLine.substr(0, 3) == "GET"){
       // Set regex parameters for file name matching
-      std::regex filePattern1(R"(data/file\d\.html)");
-      std::regex filePattern2(R"(data/image\d\.jpg)");
+      std::regex filePattern1(R"(file\d\.html)");
+      std::regex filePattern2(R"(image\d\.jpg)");
 
       // Determine if the file name matches the perscribed format. Return status codes based off of the result
       if (std::regex_search(headerFirstLine, match, filePattern1) || std::regex_search(headerFirstLine, match, filePattern2)){
-        filename = match[0];
+        filename = "data/" + match[0];
         returnCode = 200;
       }
       else{
