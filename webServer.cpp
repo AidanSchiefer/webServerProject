@@ -94,7 +94,7 @@ int readHeader(int sockFd,std::string &filename) {
 
       // Determine if the file name matches the perscribed format. Return status codes based off of the result
       if (std::regex_search(headerFirstLine, match, filePattern1) || std::regex_search(headerFirstLine, match, filePattern2)){
-        filename = "data/" + match[0];
+        filename = "data/" + match[0].str();
         returnCode = 200;
       }
       else{
