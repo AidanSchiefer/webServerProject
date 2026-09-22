@@ -114,7 +114,11 @@ int readHeader(int sockFd,std::string &filename) {
 // * - Assumes the terminator is not included, so it is appended.
 // **************************************************************************
 void sendLine(int socketFd, std::string &stringToSend) {
-  return;
+  // Create a string to send the header line back
+  std::string toSend = stringToSend + "\r\n";
+
+  // Write the message back
+  write(socketFd, toSend.c_str(), toSend.size());
 }
 
 // **************************************************************************
